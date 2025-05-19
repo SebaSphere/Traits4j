@@ -13,10 +13,8 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    // ASM core (low-level API)
     implementation 'org.ow2.asm:asm:9.7'
 
-    // Optional: Tree API for easier manipulation
     implementation 'org.ow2.asm:asm-tree:9.7'
 
 }

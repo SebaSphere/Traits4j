@@ -1,6 +1,10 @@
 package net.terradevelopment.traits4j;
 
 import net.terradevelopment.traits4j.annotations.Trait;
+import net.terradevelopment.traits4j.clazz.TraitClassVisitor;
+import net.terradevelopment.traits4j.clazz.TraitTester;
+import net.terradevelopment.traits4j.test.ExampleClass;
+import net.terradevelopment.traits4j.test.TraitExample;
 
 import java.io.File;
 import java.net.URL;
@@ -9,8 +13,30 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        new Main().run();
+
+    }
+
+    public int test = 2;
+
+    public void run() {
+
+        readAllClasses();
+
+        class TestTrait implements TraitExample {
+
+            public void test() {
+                System.out.println(meow2().get());
+            }
+        }
+        System.out.println("_____");
+        TestTrait testTrait = new TestTrait();
+        testTrait.test();
+
+    }
+
+    public static void readAllClasses() {
         var classes = getAllClasses();
-        System.out.println("MEOW");
         for (Class<?> clazz : classes) {
             addTraitData(clazz);
         }
@@ -23,11 +49,35 @@ public class Main {
     // TODO: make sure the Var<T> calls its own unique instance
     private static void addTraitData(Class<?> clazz) {
         if (clazz.isAnnotationPresent(Trait.class)) {
-            System.out.println(clazz.getName() + " is annotated with @Trait");
+            TraitClassVisitor traitClassVisitor = new TraitClassVisitor(clazz);
+            traitClassVisitor.init();
+            traitClassVisitor.complete();
         }
     }
 
-    private static List<Class<?>> getAllClasses() {
+
+    // New method to recursively find all class files
+    private static void findClasses(File directory, String packageName, List < Class < ?>>classes){
+        String[] allFiles = directory.list();
+        if (allFiles != null) {
+            for (String fileName : allFiles) {
+                File file = new File(directory, fileName);
+                if (file.isDirectory()) {
+                    findClasses(file, packageName + '.' + fileName, classes);
+                } else if (fileName.endsWith(".class")) {
+                    String className = packageName + '.' + fileName.substring(0, fileName.length() - 6);
+                    try {
+                        classes.add(Class.forName(className));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    // Call the new method from within the existing method
+    private static List<Class<?>> getAllClasses () {
         List<Class<?>> classes = new ArrayList<>();
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -38,16 +88,7 @@ public class Main {
                 throw new IllegalArgumentException("No package found by the name of " + packageName);
             }
             File directory = new File(resource.getFile());
-            String[] files = directory.list();
-
-            for (String fileName : files) {
-                if (fileName.endsWith(".class")) {
-                    String className = packageName + '.' + fileName.substring(0, fileName.length() - 6);
-                    classes.add(Class.forName(className));
-                }
-            }
-
-            return classes;
+            findClasses(directory, packageName, classes);  // Call the new method here
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -18,14 +18,14 @@ public interface TraitExample extends TraitExampleOne, TraitExampleTwo {
     SuperClass<ExampleClass> example = new SuperClass<>(new ExampleClass());
 
     // takes in a variable
-    Var<Integer> meow = new Var<>(2);
+    default Var<Integer> meow2() {
+        return new Var<>(3);
+    }
 
-    default void changeNumber() {
-        meow.set(4);
-        // should say 4
-        System.out.println(meow.get());
-        // prints a method in the superclass
-        example.get().print();
+    default int changeNumber(int num) {
+        meow2().set(num);
+
+        return meow2().get();
     }
 
 }
