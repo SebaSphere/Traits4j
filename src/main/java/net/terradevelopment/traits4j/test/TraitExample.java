@@ -1,4 +1,4 @@
-package net.terradevelopment.traits4j;
+package net.terradevelopment.traits4j.test;
 
 import net.terradevelopment.traits4j.annotations.Trait;
 import net.terradevelopment.traits4j.data.SuperClass;

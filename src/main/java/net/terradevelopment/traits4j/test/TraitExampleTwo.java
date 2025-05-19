@@ -1,4 +1,4 @@
-package net.terradevelopment.traits4j;
+package net.terradevelopment.traits4j.test;
 
 public interface TraitExampleTwo {
 
