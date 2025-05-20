@@ -69,7 +69,7 @@ public class TraitClassVisitor {
                     System.out.println("INSERTED");
 
                     beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                    beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/terradevelopment/traits4j/clazz/TraitTester", "printSuperCaller","(Ljava/lang/Object;)V", true));
+                    beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/terradevelopment/traits4j/clazz/TraitTester", "printSuperCaller","(Ljava/lang/Object;)V", false));
 
                     method.instructions.insert(beginList);
 
@@ -79,24 +79,26 @@ public class TraitClassVisitor {
     }
 
     public void complete() {
-//        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-//        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
-//        try {
-//            DataOutputStream dout = new DataOutputStream(new FileOutputStream(outputPath));
-//            dout.write(classWriter.toByteArray());
-//            dout.flush();
-//            dout.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        classNode.accept(classWriter);
+
+
+        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
+        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
+        try {
+            DataOutputStream dout = new DataOutputStream(new FileOutputStream(outputPath));
+            dout.write(classWriter.toByteArray());
+            dout.flush();
+            dout.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             System.out.println("TRYING");
 
-            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            classNode.accept(writer);
-
-            DynamicClassLoader classLoader = new DynamicClassLoader(writer.toByteArray());
+            DynamicClassLoader classLoader = new DynamicClassLoader(classWriter.toByteArray());
 
             Class<?> clazz = classLoader.loadClass(classNode.name.replaceAll("/", "."));
 
