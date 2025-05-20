@@ -2,14 +2,11 @@ package net.terradevelopment.traits4j.clazz;
 
 import net.terradevelopment.traits4j.data.Var;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class TraitClassVisitor {
 
@@ -63,6 +60,8 @@ public class TraitClassVisitor {
 
                     beginList.add(new LdcInsnNode(method.name));
 
+                    System.out.println("INSERTED");
+
                     beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
                     beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/terradevelopment/traits4j/clazz/TraitTester", "printSuperCaller","(Ljava/lang/Object;)V", false));
 
@@ -74,13 +73,28 @@ public class TraitClassVisitor {
     }
 
     public void complete() {
-        //We are done now. so dump the class
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-        classNode.accept(classWriter);
+//        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+//        classNode.accept(classWriter);
+//
+//        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
+//        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
+//        try {
+//            DataOutputStream dout = new DataOutputStream(new FileOutputStream(outputPath));
+//            dout.write(classWriter.toByteArray());
+//            dout.flush();
+//            dout.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         try {
-            KanyeClassLoader classLoader = new KanyeClassLoader();
-            classLoader.loadClass(classNode.name.replaceAll("/", "."));
+            System.out.println("TRYING");
+            KanyeClassLoader classLoader = new KanyeClassLoader(classNode);
+            Class<?> clazz = classLoader.loadClass(classNode.name.replaceAll("/", "."));
+            System.out.println("TIME");
+            System.out.println(clazz);
+            System.out.println("CALLED");
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -90,12 +104,15 @@ public class TraitClassVisitor {
 
     public static class KanyeClassLoader extends ClassLoader {
 
-        public KanyeClassLoader() {
+
+        private final ClassNode classNode;
+        public KanyeClassLoader(ClassNode classNode) {
             super(null);
+            this.classNode = classNode;
         }
 
-        protected Class<?> findClass(final String name)
-                throws ClassNotFoundException {
+        protected Class<?> findClass(final String name) {
+            System.out.println(name + " YEST");
             InputStream inputStream = getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class");
             byte[] process = null;
             try {
@@ -103,8 +120,16 @@ public class TraitClassVisitor {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+            classNode.accept(classWriter);
+
 
             return defineClass(name, process, 0, process.length);
+        }
+
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            return super.loadClass(name);
         }
     }
 
