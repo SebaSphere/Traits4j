@@ -59,7 +59,7 @@ public class TraitClassVisitor {
                     method.access &= ~Opcodes.ACC_STATIC; // this line removes the static access
                     // run hello before a field is accessed
                     InsnList beginList = new InsnList();
-                    System.out.println("INSERT");
+                    System.out.println("INSERTED INTO " + method.name);
                     System.out.println(method.name);
                     beginList.add(new LdcInsnNode(method.name));
 

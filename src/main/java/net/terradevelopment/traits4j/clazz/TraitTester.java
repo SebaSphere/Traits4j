@@ -5,7 +5,7 @@ import net.terradevelopment.traits4j.Main;
 public class TraitTester {
 
     public static void printSuperCaller(Object object) {
-        System.out.println("DADs");
+        System.out.println("THE OBJECT IS " + object.getClass());
     }
 
 }

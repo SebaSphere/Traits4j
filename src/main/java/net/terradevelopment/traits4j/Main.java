@@ -56,7 +56,7 @@ public class Main {
     // TODO: make sure the Var<T> calls its own unique instance
     private static void addTraitData(Class<?> clazz) {
         if (clazz.isAnnotationPresent(Trait.class)) {
-            System.out.println("BALLS");
+            System.out.println("TRAIT DATA ADDED TO " + clazz.getName());
             TraitClassVisitor traitClassVisitor = new TraitClassVisitor(clazz);
             traitClassVisitor.init();
             traitClassVisitor.complete();
