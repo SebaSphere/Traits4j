@@ -1,4 +1,4 @@
-package net.terradevelopment.traits4j.test;
+package net.terradevelopment.traits4j.test2;
 
 
 import net.terradevelopment.traits4j.annotations.Trait;

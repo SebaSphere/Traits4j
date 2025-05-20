@@ -1,7 +1,6 @@
-package net.terradevelopment.traits4j.test;
+package net.terradevelopment.traits4j.test2;
 
 import net.terradevelopment.traits4j.annotations.Trait;
-import net.terradevelopment.traits4j.data.SuperClass;
 
 @Trait
 public interface TraitExampleOne {

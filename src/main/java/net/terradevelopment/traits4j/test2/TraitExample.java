@@ -1,4 +1,4 @@
-package net.terradevelopment.traits4j.test;
+package net.terradevelopment.traits4j.test2;
 
 import net.terradevelopment.traits4j.annotations.Trait;
 import net.terradevelopment.traits4j.data.SuperClass;
@@ -10,7 +10,6 @@ public interface TraitExample extends TraitExampleOne, TraitExampleTwo {
 
     @Override
     default void meow() {
-        // should complain if you don't call super
         TraitExampleOne.super.meow();
     }
 

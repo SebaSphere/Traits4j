@@ -1,18 +1,19 @@
 package net.terradevelopment.traits4j.clazz;
 
 import net.terradevelopment.traits4j.data.Var;
+import net.terradevelopment.traits4j.test2.TraitExample;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class TraitClassVisitor {
 
-    private final Class<?> sourceClazz;
+    private Class<?> sourceClazz;
     private ClassReader classReader;
-    private ClassWriter classWriter;
 
     private ClassNode classNode;
 
@@ -53,17 +54,22 @@ public class TraitClassVisitor {
             }
             for (var method : classNode.methods) {
 
+
                 if (("()" + Var.class.descriptorString()).equals(method.desc)) {
+
+
+
                     method.access &= ~Opcodes.ACC_STATIC; // this line removes the static access
                     // run hello before a field is accessed
                     InsnList beginList = new InsnList();
 
                     beginList.add(new LdcInsnNode(method.name));
 
+
                     System.out.println("INSERTED");
 
                     beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                    beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/terradevelopment/traits4j/clazz/TraitTester", "printSuperCaller","(Ljava/lang/Object;)V", false));
+                    beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/terradevelopment/traits4j/clazz/TraitTester", "printSuperCaller","(Ljava/lang/Object;)V", true));
 
                     method.instructions.insert(beginList);
 
@@ -73,9 +79,6 @@ public class TraitClassVisitor {
     }
 
     public void complete() {
-//        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-//        classNode.accept(classWriter);
-//
 //        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
 //        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
 //        try {
@@ -89,8 +92,15 @@ public class TraitClassVisitor {
 
         try {
             System.out.println("TRYING");
-            KanyeClassLoader classLoader = new KanyeClassLoader(classNode);
+
+            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+            classNode.accept(writer);
+
+            DynamicClassLoader classLoader = new DynamicClassLoader(writer.toByteArray());
+
             Class<?> clazz = classLoader.loadClass(classNode.name.replaceAll("/", "."));
+
+
             System.out.println("TIME");
             System.out.println(clazz);
             System.out.println("CALLED");
@@ -100,37 +110,6 @@ public class TraitClassVisitor {
             throw new RuntimeException(e);
         }
 
-    }
-
-    public static class KanyeClassLoader extends ClassLoader {
-
-
-        private final ClassNode classNode;
-        public KanyeClassLoader(ClassNode classNode) {
-            super(null);
-            this.classNode = classNode;
-        }
-
-        protected Class<?> findClass(final String name) {
-            System.out.println(name + " YEST");
-            InputStream inputStream = getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class");
-            byte[] process = null;
-            try {
-                process = inputStream.readAllBytes();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            classNode.accept(classWriter);
-
-
-            return defineClass(name, process, 0, process.length);
-        }
-
-        @Override
-        public Class<?> loadClass(String name) throws ClassNotFoundException {
-            return super.loadClass(name);
-        }
     }
 
 

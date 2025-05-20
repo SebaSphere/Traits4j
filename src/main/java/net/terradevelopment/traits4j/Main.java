@@ -2,19 +2,10 @@ package net.terradevelopment.traits4j;
 
 import net.terradevelopment.traits4j.annotations.Trait;
 import net.terradevelopment.traits4j.clazz.TraitClassVisitor;
-import net.terradevelopment.traits4j.clazz.TraitTester;
-import net.terradevelopment.traits4j.test.ExampleClass;
-import net.terradevelopment.traits4j.test.TraitExample;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
+import net.terradevelopment.traits4j.test2.TraitExample;
 
 import java.io.File;
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
-import java.lang.instrument.Instrumentation;
 import java.net.URL;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 

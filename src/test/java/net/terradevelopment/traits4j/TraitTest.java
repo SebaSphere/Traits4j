@@ -1,12 +1,9 @@
 package net.terradevelopment.traits4j;
 
-import net.terradevelopment.traits4j.test.TraitExample;
+import net.terradevelopment.traits4j.test2.TraitExample;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 public class TraitTest {
 
