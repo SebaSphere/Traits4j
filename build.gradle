@@ -11,6 +11,8 @@ jar {
         attributes(
                 'Premain-Class': 'net.terradevelopment.traits4j.PreMain',
                 'Agent-Class': 'net.terradevelopment.traits4j.Main',
+                'Can-Redefine-Classes': 'true',
+                'Can-Retransform-Classes': 'true',
                 'Implementation-Title': 'My Java Agent',
                 'Implementation-Version': version
         )

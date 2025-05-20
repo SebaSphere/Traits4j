@@ -21,7 +21,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("MAI");
+        System.out.println("MAIN");
         new Main().run();
 
     }
@@ -38,7 +38,12 @@ public class Main {
         }
         System.out.println("_____");
         TestTrait testTrait = new TestTrait();
+        System.out.println("The main object hash is " + testTrait.hashCode());
         testTrait.test();
+
+        TestTrait testTraitTwo = new TestTrait();
+        System.out.println("The second main object hash is " + testTraitTwo.hashCode());
+        testTraitTwo.test();
 
     }
 

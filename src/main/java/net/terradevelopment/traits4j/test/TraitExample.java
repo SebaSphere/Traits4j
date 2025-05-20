@@ -17,7 +17,7 @@ public interface TraitExample extends TraitExampleOne, TraitExampleTwo {
     // should automagically apply at runtime
     SuperClass<ExampleClass> example = new SuperClass<>(new ExampleClass());
 
-    // takes in a variable
+    // acts as a variable
     default Var<Integer> meow2() {
         return new Var<>(3);
     }

@@ -8,6 +8,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class TraitClassVisitor {
@@ -59,8 +60,7 @@ public class TraitClassVisitor {
                     method.access &= ~Opcodes.ACC_STATIC; // this line removes the static access
                     // run hello before a field is accessed
                     InsnList beginList = new InsnList();
-                    System.out.println("INSERTED INTO " + method.name);
-                    System.out.println(method.name);
+
                     beginList.add(new LdcInsnNode(method.name));
 
                     beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -78,23 +78,37 @@ public class TraitClassVisitor {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         classNode.accept(classWriter);
 
-        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
         try {
-            DataOutputStream dout = new DataOutputStream(new FileOutputStream(outputPath));
-            dout.write(classWriter.toByteArray());
-            dout.flush();
-            dout.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            KanyeClassLoader classLoader = new KanyeClassLoader();
+            classLoader.loadClass(classNode.name.replaceAll("/", "."));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static class KanyeClassLoader extends ClassLoader {
+
+        public KanyeClassLoader() {
+            super(null);
+        }
+
+        protected Class<?> findClass(final String name)
+                throws ClassNotFoundException {
+            InputStream inputStream = getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class");
+            byte[] process = null;
+            try {
+                process = inputStream.readAllBytes();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return defineClass(name, process, 0, process.length);
         }
     }
 
 
-    public static byte[] readBytesFromFile(File file) throws IOException {
-        try (InputStream is = new FileInputStream(file)) {
-            return is.readAllBytes();
-        }
-    }
+
 
 }
