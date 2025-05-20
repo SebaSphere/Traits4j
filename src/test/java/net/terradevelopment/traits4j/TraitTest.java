@@ -14,11 +14,10 @@ public class TraitTest {
         }
     }
 
+    // I should probably make a test to make sure traits are actually loaded
     // makes sure traits actually work as intended
     @Test
     public void testTraitValidity() {
-
-        Main.readAllClasses(); // should run process to asm classes
 
         System.out.println("test!");
         TestTrait firstTrait = new TestTrait();

@@ -60,6 +60,7 @@ public class TraitClassVisitor {
                     // run hello before a field is accessed
                     InsnList beginList = new InsnList();
                     System.out.println("INSERT");
+                    System.out.println(method.name);
                     beginList.add(new LdcInsnNode(method.name));
 
                     beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -77,10 +78,10 @@ public class TraitClassVisitor {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         classNode.accept(classWriter);
 
+        String outputPath = sourceClazz.getProtectionDomain().getCodeSource().getLocation().getPath();
+        outputPath += sourceClazz.getName().replace('.', '/') + ".class";
         try {
-            File outDir = new File("out/" + sourceClazz.getPackage().getName().replace('.', '/'));
-            outDir.mkdirs();
-            DataOutputStream dout = new DataOutputStream(new FileOutputStream(new File(outDir, sourceClazz.getSimpleName() + ".class")));
+            DataOutputStream dout = new DataOutputStream(new FileOutputStream(outputPath));
             dout.write(classWriter.toByteArray());
             dout.flush();
             dout.close();

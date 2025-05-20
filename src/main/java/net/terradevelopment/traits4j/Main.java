@@ -5,14 +5,23 @@ import net.terradevelopment.traits4j.clazz.TraitClassVisitor;
 import net.terradevelopment.traits4j.clazz.TraitTester;
 import net.terradevelopment.traits4j.test.ExampleClass;
 import net.terradevelopment.traits4j.test.TraitExample;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 
 import java.io.File;
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
+import java.lang.instrument.Instrumentation;
 import java.net.URL;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+
     public static void main(String[] args) {
+        System.out.println("MAI");
         new Main().run();
 
     }
@@ -20,8 +29,6 @@ public class Main {
     public int test = 2;
 
     public void run() {
-
-        readAllClasses();
 
         class TestTrait implements TraitExample {
 
@@ -49,6 +56,7 @@ public class Main {
     // TODO: make sure the Var<T> calls its own unique instance
     private static void addTraitData(Class<?> clazz) {
         if (clazz.isAnnotationPresent(Trait.class)) {
+            System.out.println("BALLS");
             TraitClassVisitor traitClassVisitor = new TraitClassVisitor(clazz);
             traitClassVisitor.init();
             traitClassVisitor.complete();

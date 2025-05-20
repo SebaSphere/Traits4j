@@ -5,6 +5,41 @@ plugins {
 group = 'net.terradevelopment.traits4j'
 version = '1.0-SNAPSHOT'
 
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(
+                'Premain-Class': 'net.terradevelopment.traits4j.PreMain',
+                'Agent-Class': 'net.terradevelopment.traits4j.Main',
+                'Implementation-Title': 'My Java Agent',
+                'Implementation-Version': version
+        )
+    }
+
+    // Optional: include dependencies in the agent JAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+
+apply plugin: 'application'
+
+mainClassName = 'net.terradevelopment.traits4j.Main'
+
+run {
+    dependsOn build
+}
+
+application {
+    applicationDefaultJvmArgs = ["-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"]
+}
+
+run {
+    systemProperties System.properties
+}
+
+
 repositories {
     mavenCentral()
 }
@@ -21,4 +56,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    jvmArgs "-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"
 }
