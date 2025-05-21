@@ -57,6 +57,7 @@ dependencies {
 }
 
 test {
+    maxParallelForks = 1
+    jvmArgs += ["-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"]
     useJUnitPlatform()
-    jvmArgs "-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"
 }

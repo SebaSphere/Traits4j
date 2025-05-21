@@ -18,7 +18,7 @@ public interface TraitExample extends TraitExampleOne, TraitExampleTwo {
 
     // acts as a variable
     default Var<Integer> meow2() {
-        return new Var<>(3);
+        return new Var<>(4);
     }
 
     default int changeNumber(int num) {

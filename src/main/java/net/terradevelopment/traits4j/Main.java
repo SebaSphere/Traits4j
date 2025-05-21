@@ -1,7 +1,8 @@
 package net.terradevelopment.traits4j;
 
 import net.terradevelopment.traits4j.annotations.Trait;
-import net.terradevelopment.traits4j.clazz.TraitClassVisitor;
+import net.terradevelopment.traits4j.clazz.TraitTester;
+import net.terradevelopment.traits4j.data.Var;
 import net.terradevelopment.traits4j.test2.TraitExample;
 
 import java.io.File;
@@ -12,6 +13,8 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+        // TraitTester.getOrCreateTraitVariable(new Var(new Object()), new Object(), "test");
+
         System.out.println("MAIN");
         new Main().run();
 
@@ -31,10 +34,6 @@ public class Main {
         TestTrait testTrait = new TestTrait();
         System.out.println("The main object hash is " + testTrait.hashCode());
         testTrait.test();
-
-        TestTrait testTraitTwo = new TestTrait();
-        System.out.println("The second main object hash is " + testTraitTwo.hashCode());
-        testTraitTwo.test();
 
     }
 

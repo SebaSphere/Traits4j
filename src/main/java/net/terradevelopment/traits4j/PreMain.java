@@ -5,6 +5,7 @@ import net.terradevelopment.traits4j.data.Var;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
@@ -21,13 +22,13 @@ public class PreMain {
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("MEOW! premain");
         var classes = PreMain.getAllClasses();
-        for (Class<?> clazz : classes) {
-            if (clazz.isAnnotationPresent(Trait.class)) {
+        for (Class<?> originalClazz : classes) {
+            if (originalClazz.isAnnotationPresent(Trait.class)) {
                 System.out.println("MEOW! trait");
 
                 try {
-                    var modifiedClassBytes = modifyClassBytes(getClassBytes(clazz));
-                    inst.redefineClasses(new ClassDefinition(clazz, modifiedClassBytes));
+                    var modifiedClassBytes = modifyClassBytes(getClassBytes(originalClazz), originalClazz);
+                    inst.redefineClasses(new ClassDefinition(originalClazz, modifiedClassBytes));
                 } catch (IOException | ClassNotFoundException | UnmodifiableClassException e) {
                     throw new RuntimeException(e);
                 }
@@ -46,22 +47,75 @@ public class PreMain {
         }
     }
 
-    private static byte[] modifyClassBytes(byte[] classfileBuffer) {
+
+    private static byte[] modifyClassBytes(byte[] classfileBuffer, Class<?> originalClazz) {
         ClassReader cr = new ClassReader(classfileBuffer);
         ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
 
-        for (MethodNode method : cn.methods) {
-            if (("()" + Var.class.descriptorString()).equals(method.desc)) {
-                method.access &= ~Opcodes.ACC_STATIC;
-                InsnList beginList = new InsnList();
-                beginList.add(new LdcInsnNode(method.name));
-                beginList.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                beginList.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+        for (MethodNode methodNode : cn.methods) {
+            if (("()" + Var.class.descriptorString()).equals(methodNode.desc)) {
+                methodNode.access &= ~Opcodes.ACC_STATIC;
+
+                // methodNode.instructions.clear();
+
+                Type methodType = Type.getMethodType(methodNode.desc);
+                Type returnType = methodType.getReturnType();  // This is what we want
+
+                System.out.println("REEFR");
+                System.out.println(returnType);
+
+
+                InsnList insns = new InsnList();
+
+                // new Var(3)
+                // TODO: should be fixed to take in the previous loaded "Opcodes.ARETURN" value instead of "new Var(3)"
+                insns.add(new TypeInsnNode(Opcodes.NEW, "net/terradevelopment/traits4j/data/Var"));
+                insns.add(new InsnNode(Opcodes.DUP));
+                insns.add(new InsnNode(Opcodes.ICONST_3)); // Push int 3
+                insns.add(new MethodInsnNode(
+                        Opcodes.INVOKESTATIC,
+                        "java/lang/Integer",
+                        "valueOf",
+                        "(I)Ljava/lang/Integer;",
+                        false
+                ));
+                insns.add(new MethodInsnNode(
+                        Opcodes.INVOKESPECIAL,
+                        "net/terradevelopment/traits4j/data/Var",
+                        "<init>",
+                        "(Ljava/lang/Object;)V",
+                        false
+                ));
+
+                // new Object()
+                insns.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Object"));
+                insns.add(new InsnNode(Opcodes.DUP));
+                insns.add(new MethodInsnNode(
+                        Opcodes.INVOKESPECIAL,
+                        "java/lang/Object",
+                        "<init>",
+                        "()V",
+                        false
+                ));
+
+                // ldc "test"
+                insns.add(new LdcInsnNode("test22123"));
+
+                // call TraitTester.getOrCreateTraitVariable(...)
+                insns.add(new MethodInsnNode(
+                        Opcodes.INVOKESTATIC,
                         "net/terradevelopment/traits4j/clazz/TraitTester",
-                        "printSuperCaller", "(Ljava/lang/Object;)V", false));
-                method.instructions.insert(beginList);
+                        "getOrCreateTraitVariable",
+                        "(Lnet/terradevelopment/traits4j/data/Var;Ljava/lang/Object;Ljava/lang/String;)Lnet/terradevelopment/traits4j/data/Var;",
+                        false
+                ));
+                // return the var
+                insns.add(new InsnNode(Opcodes.ARETURN));
+
+                methodNode.instructions.insert(insns);
             }
+
         }
 
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);

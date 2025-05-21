@@ -135,7 +135,6 @@ public class TraitClassVisitor {
         }
 
         protected Class<?> findClass(String name) {
-            System.out.println(name + " YEST");
             InputStream inputStream = getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class");
             byte[] process = null;
             try {
