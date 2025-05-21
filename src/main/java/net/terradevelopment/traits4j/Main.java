@@ -81,7 +81,7 @@ public class Main {
     }
 
     // Call the new method from within the existing method
-    private static List<Class<?>> getAllClasses () {
+    public static List<Class<?>> getAllClasses () {
         List<Class<?>> classes = new ArrayList<>();
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
