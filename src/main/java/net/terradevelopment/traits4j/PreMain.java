@@ -7,17 +7,20 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.*;
+import java.net.URL;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PreMain {
 
     public static void premain(String agentArgs, Instrumentation inst) {
-        System.out.println("MEOW! permain");
-        // Main.readAllClasses();
-        var classes = Main.getAllClasses();
+        System.out.println("MEOW! premain");
+        var classes = PreMain.getAllClasses();
         for (Class<?> clazz : classes) {
             if (clazz.isAnnotationPresent(Trait.class)) {
                 System.out.println("MEOW! trait");
@@ -48,7 +51,6 @@ public class PreMain {
         ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
 
-        // Do your same method manipulation here:
         for (MethodNode method : cn.methods) {
             if (("()" + Var.class.descriptorString()).equals(method.desc)) {
                 method.access &= ~Opcodes.ACC_STATIC;
@@ -66,4 +68,45 @@ public class PreMain {
         cn.accept(cw);
         return cw.toByteArray();
     }
+
+    // New method to recursively find all class files
+    private static void findClasses(File directory, String packageName, List< Class < ?>> classes){
+        String[] allFiles = directory.list();
+        if (allFiles != null) {
+            for (String fileName : allFiles) {
+                File file = new File(directory, fileName);
+                if (file.isDirectory()) {
+                    findClasses(file, packageName + '.' + fileName, classes);
+                } else if (fileName.endsWith(".class")) {
+                    String className = packageName + '.' + fileName.substring(0, fileName.length() - 6);
+                    try {
+                        classes.add(Class.forName(className));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    // Call the new method from within the existing method
+    public static List<Class<?>> getAllClasses () {
+        List<Class<?>> classes = new ArrayList<>();
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            String packageName = Main.class.getPackage().getName();
+            String path = packageName.replace('.', '/');
+            URL resource = classLoader.getResource(path);
+            if (resource == null) {
+                throw new IllegalArgumentException("No package found by the name of " + packageName);
+            }
+            File directory = new File(resource.getFile());
+            findClasses(directory, packageName, classes);  // Call the new method here
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
+
 }
