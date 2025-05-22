@@ -26,14 +26,25 @@ public class Main {
 
         class TestTrait implements TraitExample {
 
-            public void test() {
-                System.out.println(meow2().get());
+            public String test() {
+                return "The value is " + meow2().get();
             }
+
         }
         System.out.println("_____");
-        TestTrait testTrait = new TestTrait();
-        System.out.println("The main object hash is " + testTrait.hashCode());
-        testTrait.test();
+        TestTrait testTraitOne = new TestTrait();
+        System.out.println("The testTraitOne object hash is " + testTraitOne.hashCode());
+        System.out.println("Initial set value is " + testTraitOne.meow2().get());
+        testTraitOne.meow2().set(32);
+        System.out.println("After set value is " + testTraitOne.meow2().get());
+
+        System.out.println("_____");
+        TestTrait testTraitTwo = new TestTrait();
+        System.out.println("The testTraitTwo object hash is " + testTraitTwo.hashCode());
+        System.out.println("Initial set value is " + testTraitTwo.meow2().get());
+
+        System.out.println("_____");
+        System.out.println("testTraitOne still has the value of " + testTraitOne.meow2().get());
 
     }
 

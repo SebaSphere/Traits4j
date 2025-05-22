@@ -38,16 +38,43 @@ public class TraitTester {
         }
     }
 
+    // class hash to variable map
     public static HashMap<Integer, ArrayList<VariableData<?>>> variables = new HashMap<>();
 
     public static Var<?> getOrCreateTraitVariable(Var<?> var, Object instance, String name) {
+        int hash = instance.hashCode();
+        var existingObjectVariables = variables.get(hash);
 
-        // convert varClazz to Var instance
+        if (existingObjectVariables == null) {
+            // Instance has no variables yet, so create list and add cloned variable
+            try {
+                Var<?> clone = var.clone();
+                VariableData<?> variableData = new VariableData<>(name.hashCode(), clone);
+                ArrayList<VariableData<?>> list = new ArrayList<>();
+                list.add(variableData);
+                variables.put(hash, list);
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException("Failed to clone Var", e);
+            }
+        } else {
+            // Instance exists, check if variable already present
+            for (VariableData<?> variableData : existingObjectVariables) {
+                if (variableData.getHashCode() == name.hashCode()) {
+                    return variableData.getVar(); // Return existing var
+                }
+            }
 
-        System.out.println(name);
-
-        System.out.println("TE2ST!");
-        return var;
+            // Not found, so clone and add new one
+            try {
+                Var<?> clone = var.clone();
+                VariableData<?> variableData = new VariableData<>(name.hashCode(), clone);
+                existingObjectVariables.add(variableData);
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException("Failed to clone Var", e);
+            }
+        }
     }
 
 }
