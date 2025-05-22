@@ -1,14 +1,6 @@
 package net.terradevelopment.traits4j;
 
-import net.terradevelopment.traits4j.annotations.Trait;
-import net.terradevelopment.traits4j.clazz.TraitTester;
-import net.terradevelopment.traits4j.data.Var;
 import net.terradevelopment.traits4j.test2.TraitExample;
-
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
 
@@ -27,25 +19,33 @@ public class Main {
         class TestTrait implements TraitExample {
 
             public String test() {
-                return "The value is " + meow2().get();
+                return "The value is " + exampleTraitVariable().get();
             }
 
         }
         System.out.println("_____");
         TestTrait testTraitOne = new TestTrait();
         System.out.println("The testTraitOne object hash is " + testTraitOne.hashCode());
-        System.out.println("Initial set value is " + testTraitOne.meow2().get());
-        testTraitOne.meow2().set(32);
-        System.out.println("After set value is " + testTraitOne.meow2().get());
+        System.out.println("Initial exampleTraitVariable set value is " + testTraitOne.exampleTraitVariable().get());
+        testTraitOne.exampleTraitVariable().set(32);
+        System.out.println("After exampleTraitVariable set value is " + testTraitOne.exampleTraitVariable().get());
 
         System.out.println("_____");
         TestTrait testTraitTwo = new TestTrait();
         System.out.println("The testTraitTwo object hash is " + testTraitTwo.hashCode());
-        System.out.println("Initial set value is " + testTraitTwo.meow2().get());
+        System.out.println("Initial exampleTraitVariable set value is " + testTraitTwo.exampleTraitVariable().get());
 
         System.out.println("_____");
-        System.out.println("testTraitOne still has the value of " + testTraitOne.meow2().get());
+        System.out.println("testTraitOne exampleTraitVariable still has the value of " + testTraitOne.exampleTraitVariable().get());
 
+
+        System.out.println("_____");
+        System.out.println("testTraitOne exampleOneTraitVariable is " + testTraitOne.exampleOneTraitVariable().get());
+        System.out.println("testTraitTwo exampleOneTraitVariable is " + testTraitTwo.exampleOneTraitVariable().get());
+        testTraitOne.exampleOneTraitVariable().set(94);
+        System.out.println("exampleOneTraitVariable set to 94");
+        System.out.println("testTraitOne exampleOneTraitVariable is " + testTraitOne.exampleOneTraitVariable().get());
+        System.out.println("testTraitTwo exampleOneTraitVariable is " + testTraitTwo.exampleOneTraitVariable().get());
     }
 
 }

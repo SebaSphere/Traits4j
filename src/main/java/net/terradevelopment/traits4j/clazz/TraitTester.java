@@ -41,6 +41,7 @@ public class TraitTester {
     // class hash to variable map
     public static HashMap<Integer, ArrayList<VariableData<?>>> variables = new HashMap<>();
 
+    // TODO: this is o(n), ideally we want log(n) for fetching existing variables of an object
     public static Var<?> getOrCreateTraitVariable(Var<?> var, Object instance, String name) {
         int hash = instance.hashCode();
         var existingObjectVariables = variables.get(hash);
@@ -48,12 +49,17 @@ public class TraitTester {
         if (existingObjectVariables == null) {
             // Instance has no variables yet, so create list and add cloned variable
             try {
-                Var<?> clone = var.clone();
-                VariableData<?> variableData = new VariableData<>(name.hashCode(), clone);
+                Var<?> varToSend;
+                if (var != null) {
+                    varToSend = var.clone();
+                } else {
+                    varToSend = new Var<>(null);
+                }
+                VariableData<?> variableData = new VariableData<>(name.hashCode(), varToSend);
                 ArrayList<VariableData<?>> list = new ArrayList<>();
                 list.add(variableData);
                 variables.put(hash, list);
-                return clone;
+                return varToSend;
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException("Failed to clone Var", e);
             }

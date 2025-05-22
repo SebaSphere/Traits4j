@@ -29,14 +29,6 @@ public class TraitTesterTest {
 
     @Test
     void testTraitEquals() {
-        DataTrait traitOne = new DataTrait();
-        DataTrait traitTwo = new DataTrait();
-
-        System.out.println(traitOne.meow2().get());
-
-        traitOne.meow2().set(34);
-
-
 
     }
 
