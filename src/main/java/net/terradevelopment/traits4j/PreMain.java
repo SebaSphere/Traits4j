@@ -66,44 +66,20 @@ public class PreMain {
                 System.out.println(returnType);
 
 
-                InsnList insns = new InsnList();
+                InsnList beforeReturnInsert = new InsnList();
 
                 // new Var(3)
-                // TODO: should be fixed to take in the previous loaded "Opcodes.ARETURN" value instead of "new Var(3)"
-                insns.add(new TypeInsnNode(Opcodes.NEW, "net/terradevelopment/traits4j/data/Var"));
-                insns.add(new InsnNode(Opcodes.DUP));
-                insns.add(new InsnNode(Opcodes.ICONST_3)); // Push int 3
-                insns.add(new MethodInsnNode(
-                        Opcodes.INVOKESTATIC,
-                        "java/lang/Integer",
-                        "valueOf",
-                        "(I)Ljava/lang/Integer;",
-                        false
-                ));
-                insns.add(new MethodInsnNode(
-                        Opcodes.INVOKESPECIAL,
-                        "net/terradevelopment/traits4j/data/Var",
-                        "<init>",
-                        "(Ljava/lang/Object;)V",
-                        false
-                ));
+                // it inserts what should be in the return value just before returning so it should already have the old variable in memory
+                // TODO: handle null
 
-                // new Object()
-                insns.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Object"));
-                insns.add(new InsnNode(Opcodes.DUP));
-                insns.add(new MethodInsnNode(
-                        Opcodes.INVOKESPECIAL,
-                        "java/lang/Object",
-                        "<init>",
-                        "()V",
-                        false
-                ));
+                // inserts instance of object
+                beforeReturnInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
 
-                // ldc "test"
-                insns.add(new LdcInsnNode("test22123"));
+                // inputs variable name
+                beforeReturnInsert.add(new LdcInsnNode(methodNode.name));
 
                 // call TraitTester.getOrCreateTraitVariable(...)
-                insns.add(new MethodInsnNode(
+                beforeReturnInsert.add(new MethodInsnNode(
                         Opcodes.INVOKESTATIC,
                         "net/terradevelopment/traits4j/clazz/TraitTester",
                         "getOrCreateTraitVariable",
@@ -111,9 +87,16 @@ public class PreMain {
                         false
                 ));
                 // return the var
-                insns.add(new InsnNode(Opcodes.ARETURN));
+                beforeReturnInsert.add(new InsnNode(Opcodes.ARETURN));
 
-                methodNode.instructions.insert(insns);
+                for (var instruction : methodNode.instructions) {
+                    if (instruction.getOpcode() == Opcodes.ARETURN) {
+                        // insert just before this instruction
+                        methodNode.instructions.insertBefore(instruction, beforeReturnInsert);
+                    }
+                }
+
+                // methodNode.instructions.insert(beforeReturnInsert);
             }
 
         }

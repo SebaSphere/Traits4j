@@ -40,7 +40,7 @@ public class TraitTester {
 
     public static HashMap<Integer, ArrayList<VariableData<?>>> variables = new HashMap<>();
 
-    public static Var<?> getOrCreateTraitVariable(Var var, Object instance, String name) {
+    public static Var<?> getOrCreateTraitVariable(Var<?> var, Object instance, String name) {
 
         // convert varClazz to Var instance
 
