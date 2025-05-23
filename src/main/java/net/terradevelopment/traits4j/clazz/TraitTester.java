@@ -38,6 +38,9 @@ public class TraitTester {
         }
     }
 
+
+
+
     // class hash to variable map
     public static HashMap<Integer, ArrayList<VariableData<?>>> variables = new HashMap<>();
 

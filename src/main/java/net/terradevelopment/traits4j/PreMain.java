@@ -1,6 +1,7 @@
 package net.terradevelopment.traits4j;
 
 import net.terradevelopment.traits4j.annotations.Trait;
+import net.terradevelopment.traits4j.clazz.TraitImplementationUtil;
 import net.terradevelopment.traits4j.data.Var;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -53,53 +54,7 @@ public class PreMain {
         ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
 
-        for (MethodNode methodNode : cn.methods) {
-            if (("()" + Var.class.descriptorString()).equals(methodNode.desc)) {
-                methodNode.access &= ~Opcodes.ACC_STATIC;
-
-                // methodNode.instructions.clear();
-
-                Type methodType = Type.getMethodType(methodNode.desc);
-                Type returnType = methodType.getReturnType();  // This is what we want
-
-                System.out.println("REEFR");
-                System.out.println(returnType);
-
-
-                InsnList beforeReturnInsert = new InsnList();
-
-                // new Var(3)
-                // it inserts what should be in the return value just before returning so it should already have the old variable in memory
-                // TODO: handle null
-
-                // inserts instance of object
-                beforeReturnInsert.add(new VarInsnNode(Opcodes.ALOAD, 0));
-
-                // inputs variable name
-                beforeReturnInsert.add(new LdcInsnNode(methodNode.name));
-
-                // call TraitTester.getOrCreateTraitVariable(...)
-                beforeReturnInsert.add(new MethodInsnNode(
-                        Opcodes.INVOKESTATIC,
-                        "net/terradevelopment/traits4j/clazz/TraitTester",
-                        "getOrCreateTraitVariable",
-                        "(Lnet/terradevelopment/traits4j/data/Var;Ljava/lang/Object;Ljava/lang/String;)Lnet/terradevelopment/traits4j/data/Var;",
-                        false
-                ));
-                // return the var
-                beforeReturnInsert.add(new InsnNode(Opcodes.ARETURN));
-
-                for (var instruction : methodNode.instructions) {
-                    if (instruction.getOpcode() == Opcodes.ARETURN) {
-                        // insert just before this instruction
-                        methodNode.instructions.insertBefore(instruction, beforeReturnInsert);
-                    }
-                }
-
-                // methodNode.instructions.insert(beforeReturnInsert);
-            }
-
-        }
+        TraitImplementationUtil.modifyClassNode(cn);
 
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         cn.accept(cw);
