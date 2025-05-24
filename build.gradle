@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id 'org.gradle.maven-publish'
 }
 
 group = 'net.terradevelopment.traits4j'
-version = '1.0-SNAPSHOT'
+version = '1.0.4-SNAPSHOT'
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -24,7 +25,6 @@ jar {
     }
 }
 
-
 apply plugin: 'application'
 
 mainClassName = 'net.terradevelopment.traits4j.Main'
@@ -34,7 +34,7 @@ run {
 }
 
 application {
-    applicationDefaultJvmArgs = ["-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"]
+    applicationDefaultJvmArgs = ["-javaagent:${buildDir}/libs/Traits4j-${version}.jar"]
 }
 
 run {
@@ -44,20 +44,35 @@ run {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    implementation 'org.ow2.asm:asm:9.7'
+    compileOnly  'org.ow2.asm:asm:9.6'
+    compileOnly  'org.ow2.asm:asm-tree:9.6'
 
-    implementation 'org.ow2.asm:asm-tree:9.7'
+//    runtimeOnly  'org.ow2.asm:asm:9.6'
+//    runtimeOnly  'org.ow2.asm:asm-tree:9.6'
 
+
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'net.terradevelopment.traits4j'
+            artifactId = 'traits4j'
+            version = version
+        }
+    }
 }
 
 test {
     maxParallelForks = 1
-    jvmArgs += ["-javaagent:${buildDir}/libs/Traits4j-1.0-SNAPSHOT.jar"]
+    jvmArgs += ["-javaagent:${buildDir}/libs/Traits4j-${version}.jar"]
     useJUnitPlatform()
 }
